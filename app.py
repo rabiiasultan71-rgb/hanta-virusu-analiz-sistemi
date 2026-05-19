@@ -557,5 +557,3 @@ elif kategori == "📜 6. Geçmiş Analiz Kayıtları":
             st.error(f"Kayıtlar listelenirken bir hata oluştu: {e}")
     else:
         st.warning("⚠️ Veritabanı dosyası henüz oluşmamış. 3. Modülden ilk analizi yaptığınızda otomatik açılacaktır.")
-        import base64
-

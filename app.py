@@ -557,3 +557,63 @@ elif kategori == "📜 6. Geçmiş Analiz Kayıtları":
             st.error(f"Kayıtlar listelenirken bir hata oluştu: {e}")
     else:
         st.warning("⚠️ Veritabanı dosyası henüz oluşmamış. 3. Modülden ilk analizi yaptığınızda otomatik açılacaktır.")
+        import base64
+
+# --- HEM MOBİL HEM PC UYUMLU ARKA PLAN VE BEYAZ YAZI CSS KODU ---
+def fix_styles_and_background(file_name):
+    try:
+        with open(file_name, "rb") as f:
+            data = f.read()
+        encoded = base64.b64encode(data).decode()
+        
+        st.markdown(
+            f"""
+            <style>
+            /* Arka planı hem PC hem Telefonda tam sığacak şekilde sabitler */
+            .stApp {{
+                background-image: url("data:image/png;base64,{encoded}");
+                background-attachment: fixed;
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+            }}
+            
+            /* TELEFONLAR İÇİN ÖZEL AYAR: Resmin mobilde kaymasını engeller */
+            @media (max-width: 768px) {{
+                .stApp {{
+                    background-attachment: scroll !important;
+                    background-size: cover !important;
+                }}
+            }}
+
+            #ffffff !important;
+            /* Tüm silik ve okunmayan gri yazıları BEMBEYAZ yapar */
+            label, .stWidgetLabel, p, span, .stCheckbox label p {{
+                color: #FFFFFF !important;
+                font-weight: 700 !important;
+                text-shadow: 1px 1px 3px rgba(0,0,0,0.8); /* Yazının arkasına gölge atarak okunurluğu artırır */
+            }}
+            
+            /* Seçim kutularının (Selectbox) içindeki yazıları beyaz yapar */
+            div[data-baseweb="select"] * {{
+                color: #FFFFFF !important;
+            }}
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+    except Exception as e:
+        # Eğer resim okunamazsa en azından yazılar beyaz kalsın diye koruma
+        st.markdown(
+            """
+            <style>
+            label, .stWidgetLabel, p, span, .stCheckbox label p { color: #FFFFFF !important; font-weight: 700 !important; }
+            div[data-baseweb="select"] * { color: #FFFFFF !important; }
+            </style>
+            """, 
+            unsafe_allow_html=True
+        )
+
+# Fonksiyonu GitHub'daki resim adınla çağırıyoruz
+fix_styles_and_background("arka_plan.png")
+# ---------------------------------------------------------------

@@ -6,6 +6,7 @@ import os
 import joblib  # Kütüphaneyi en üste aldık
 from datetime import datetime  # Hata veren eksik kütüphaneyi ekledik
 import io  # Excel indirme işlemi için gerekli kütüphane
+import base64  # Arka plan görsel dönüşümü için gerekli kütüphane
 
 # ==========================================
 # GÖRSEL TEMA VE SAYFA YAPILANDURMASI
@@ -17,12 +18,71 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# ==========================================
+# 📱 İPHONE & BEYAZ YAZI GÖRSEL DÜZELTME KATMANI
+# ==========================================
+def mobil_ve_yazi_duzelt():
+    gorsel = "arka_plan.png"
+    encoded = ""
+    try:
+        if os.path.exists(gorsel):
+            with open(gorsel, "rb") as f:
+                encoded = base64.b64encode(f.read()).decode()
+    except:
+        pass
+
+    st.markdown(
+        f"""
+        <style>
+        /* 1. TÜM SİLİK YAZILARI BEMBEYAZ VE OKUNUR YAP */
+        label, .stWidgetLabel, p, span, .stCheckbox label p, .stSlider > label {{
+            color: #FFFFFF !important;
+            font-weight: 700 !important;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.9) !important;
+        }}
+        
+        /* 2. SEÇİM KUTULARININ (SELECTBOX) YAZILARINI BEYAZ YAP */
+        div[data-baseweb="select"] * {{
+            color: #FFFFFF !important;
+        }}
+
+        /* 3. ARKA PLAN RESMİNİ PC İÇİN SABİTLE */
+        .stApp {{
+            background-image: url("data:image/png;base64,{encoded}");
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }}
+        
+        /* 4. İPHONE / MOBİL EKRANLAR İÇİN ÖZEL RE-SİSTANS AYARI */
+        @media only screen and (max-width: 768px) {{
+            .stApp {{
+                background-attachment: scroll !important; /* iPhone'da resmin donup silikleşmesini önler */
+                background-size: cover !important;
+            }}
+            /* Telefonda yazılar daha net okunsun diye arkaya hafif koyu bir perde çeker */
+            .stApp::before {{
+                content: "";
+                position: absolute;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background-color: rgba(0, 0, 0, 0.55) !important;
+                z-index: -1;
+            }}
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+# Görsel ve yazı düzeltme sihirbazını çalıştırıyoruz
+mobil_ve_yazi_duzelt()
+
+# ==========================================
+# VARYASYONEL SİTE TASARIM ELEMENTLERİ
+# ==========================================
 st.markdown("""
     <style>
-    .stApp {
-        background-color: #0f1115;
-        color: #ffffff;
-    }
     [data-testid="stSidebar"] {
         background-color: #161920;
         border-right: 2px solid #ff3333;
@@ -418,7 +478,7 @@ elif kategori == "👁️ 4. Akıllı Görsel Analiz":
                 <div style='background-color: #161920; padding: 20px; border-radius: 8px; border-left: 5px solid #2ecc71; margin-top:15px;'>
                     <h4 style='color: #2ecc71; margin-top:0; font-size:18px;'>📊 Hücresel Bağışıklık Yanıtı</h4>
                     <p style='font-size:14px; color:#bdc3c7; line-height:1.5;'>
-                        Vücut virüsü yok etmek için kontrolsüz bir şekilde <b>CD8+ T sitotoksik hücreleri</b> ve sitokin (IL-6, TNF-alfa) salgılar. Asıl endotel hasarını ve sızıntıyı büyüten şey virüsün kendisi değil, vücudun verdiği bu aşırı immun (bağışıklık) tepkidir. This durum laboratuvarda <b>Trombositopeni (pulmoner yatakta trombositlerin göllenmesi)</b> olarak kendisini gösterir.
+                        Vücut virüsü yok etmek için kontrolsüz bir şekilde <b>CD8+ T sitotoksik hücreleri</b> ve sitokin (IL-6, TNF-alfa) salgılar. Asıl endotel hasarını ve sızıntıyı büyüten şey virüsün kendisi değil, vücudun verdiği bu aşırı immun (bağışıklık) tepkidir. Bu durum laboratuvarda <b>Trombositopeni (pulmoner yatakta trombositlerin göllenmesi)</b> olarak kendisini gösterir.
                     </p>
                 </div>
                 """, unsafe_allow_html=True)
@@ -540,7 +600,6 @@ elif kategori == "📜 6. Geçmiş Analiz Kayıtları":
                     
                 with btn_col2:
                     # 🔵 CSV OLARAK İNDİRME İŞLEMİ
-                    # Excel sevmeyenler veya ham veri isteyenler için alternatif yedek buton
                     csv_veri = df_gecmis.to_csv(index=False).encode('utf-8')
                     st.download_button(
                         label="📥 Tabloyu CSV Olarak İndir (.csv)",
